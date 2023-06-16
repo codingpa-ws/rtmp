@@ -79,8 +79,8 @@ type Session struct {
 	logger         *zap.Logger
 	sessionID      string
 	clientMetadata clientMetadata
-	broadcaster    *Broadcaster // broadcasts audio/video messages to playback clients subscribed to a stream
-	active         bool         // true if the session is active
+	broadcaster    Broadcaster
+	active         bool
 
 	// Callbacks (for RTMP clients)
 	OnAudio    AudioCallback
@@ -104,7 +104,7 @@ type Session struct {
 	serverAddress  string
 }
 
-func NewSession(logger *zap.Logger, b *Broadcaster) *Session {
+func NewSession(logger *zap.Logger, b Broadcaster) *Session {
 	session := &Session{
 		logger:      logger,
 		sessionID:   rand.GenerateUuid(),

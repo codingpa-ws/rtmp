@@ -11,33 +11,55 @@ type Subscriber interface {
 	SendEndOfStream()
 }
 
-type Broadcaster struct {
-	context ContextStore
+type Broadcaster interface {
+	BroadcastAudio(streamKey string, audio []byte, timestamp uint32) error
+	BroadcastEndOfStream(streamKey string)
+	BroadcastMetadata(streamKey string, metadata map[string]interface{}) error
+	BroadcastVideo(streamKey string, video []byte, timestamp uint32) error
+	DestroyPublisher(streamKey string) error
+	DestroySubscriber(streamKey string, sessionID string) error
+	GetAacSequenceHeaderForPublisher(streamKey string) []byte
+	GetAvcSequenceHeaderForPublisher(streamKey string) []byte
+	RegisterPublisher(streamKey string) error
+	RegisterSubscriber(streamKey string, subscriber Subscriber) error
+	SetAacSequenceHeaderForPublisher(streamKey string, payload []byte)
+	SetAvcSequenceHeaderForPublisher(streamKey string, payload []byte)
+	StreamExists(streamKey string) bool
+	SetSessionGuard(SessionGuard)
+	GetSessionGuard() SessionGuard
+	AppName() string
 }
 
-func NewBroadcaster(context ContextStore) *Broadcaster {
-	return &Broadcaster{
+type broadcaster struct {
+	appName      string
+	context      ContextStore
+	sessionGuard SessionGuard
+}
+
+func NewBroadcaster(appName string, context ContextStore) Broadcaster {
+	return &broadcaster{
+		appName: appName,
 		context: context,
 	}
 }
 
-func (b *Broadcaster) RegisterPublisher(streamKey string) error {
+func (b *broadcaster) RegisterPublisher(streamKey string) error {
 	return b.context.RegisterPublisher(streamKey)
 }
 
-func (b *Broadcaster) DestroyPublisher(streamKey string) error {
+func (b *broadcaster) DestroyPublisher(streamKey string) error {
 	return b.context.DestroyPublisher(streamKey)
 }
 
-func (b *Broadcaster) RegisterSubscriber(streamKey string, subscriber Subscriber) error {
+func (b *broadcaster) RegisterSubscriber(streamKey string, subscriber Subscriber) error {
 	return b.context.RegisterSubscriber(streamKey, subscriber)
 }
 
-func (b *Broadcaster) StreamExists(streamKey string) bool {
+func (b *broadcaster) StreamExists(streamKey string) bool {
 	return b.context.StreamExists(streamKey)
 }
 
-func (b *Broadcaster) BroadcastAudio(streamKey string, audio []byte, timestamp uint32) error {
+func (b *broadcaster) BroadcastAudio(streamKey string, audio []byte, timestamp uint32) error {
 	subscribers, err := b.context.GetSubscribersForStream(streamKey)
 	if err != nil {
 		fmt.Println("broadcaster: BroadcastAudio: error getting subscribers for stream, " + err.Error())
@@ -49,7 +71,7 @@ func (b *Broadcaster) BroadcastAudio(streamKey string, audio []byte, timestamp u
 	return nil
 }
 
-func (b *Broadcaster) BroadcastVideo(streamKey string, video []byte, timestamp uint32) error {
+func (b *broadcaster) BroadcastVideo(streamKey string, video []byte, timestamp uint32) error {
 	subscribers, err := b.context.GetSubscribersForStream(streamKey)
 	if err != nil {
 		fmt.Println("broadcaster: BroadcastVideo: error getting subscribers for stream, " + err.Error())
@@ -62,27 +84,27 @@ func (b *Broadcaster) BroadcastVideo(streamKey string, video []byte, timestamp u
 	return nil
 }
 
-func (b *Broadcaster) DestroySubscriber(streamKey string, sessionID string) error {
+func (b *broadcaster) DestroySubscriber(streamKey string, sessionID string) error {
 	return b.context.DestroySubscriber(streamKey, sessionID)
 }
 
-func (b *Broadcaster) SetAvcSequenceHeaderForPublisher(streamKey string, payload []byte) {
+func (b *broadcaster) SetAvcSequenceHeaderForPublisher(streamKey string, payload []byte) {
 	b.context.SetAvcSequenceHeaderForPublisher(streamKey, payload)
 }
 
-func (b *Broadcaster) GetAvcSequenceHeaderForPublisher(streamKey string) []byte {
+func (b *broadcaster) GetAvcSequenceHeaderForPublisher(streamKey string) []byte {
 	return b.context.GetAvcSequenceHeaderForPublisher(streamKey)
 }
 
-func (b *Broadcaster) SetAacSequenceHeaderForPublisher(streamKey string, payload []byte) {
+func (b *broadcaster) SetAacSequenceHeaderForPublisher(streamKey string, payload []byte) {
 	b.context.SetAacSequenceHeaderForPublisher(streamKey, payload)
 }
 
-func (b *Broadcaster) GetAacSequenceHeaderForPublisher(streamKey string) []byte {
+func (b *broadcaster) GetAacSequenceHeaderForPublisher(streamKey string) []byte {
 	return b.context.GetAacSequenceHeaderForPublisher(streamKey)
 }
 
-func (b *Broadcaster) BroadcastEndOfStream(streamKey string) {
+func (b *broadcaster) BroadcastEndOfStream(streamKey string) {
 	subscribers, err := b.context.GetSubscribersForStream(streamKey)
 	if err != nil {
 		fmt.Println("broadcaster: broadcast end of stream: error getting subscribers for stream, " + err.Error())
@@ -94,7 +116,7 @@ func (b *Broadcaster) BroadcastEndOfStream(streamKey string) {
 	}
 }
 
-func (b *Broadcaster) BroadcastMetadata(streamKey string, metadata map[string]interface{}) error {
+func (b *broadcaster) BroadcastMetadata(streamKey string, metadata map[string]interface{}) error {
 	subscribers, err := b.context.GetSubscribersForStream(streamKey)
 	if err != nil {
 		fmt.Println("broadcaster: BroadcastVideo: error getting subscribers for stream, " + err.Error())

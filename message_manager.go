@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/codingpa-ws/rtmp/amf"
 	"github.com/codingpa-ws/rtmp/amf/amf0"
 	"github.com/codingpa-ws/rtmp/audio"
 	"github.com/codingpa-ws/rtmp/constants"
@@ -225,7 +226,7 @@ func (m *MessageManager) handleCommandAmf0(csID uint32, streamID uint32, command
 
 	switch commandName {
 	case "connect":
-		m.session.onConnect(csID, transactionId, commandObject)
+		m.session.onConnect(csID, transactionId, amf.Metadata(commandObject))
 	case "releaseStream":
 		streamKey, _ := amf0.Decode(payload)
 		m.session.onReleaseStream(csID, transactionId, commandObject, streamKey.(string))

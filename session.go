@@ -3,6 +3,7 @@ package rtmp
 import (
 	"fmt"
 
+	"github.com/codingpa-ws/rtmp/amf"
 	"github.com/codingpa-ws/rtmp/audio"
 	"github.com/codingpa-ws/rtmp/constants"
 	"github.com/codingpa-ws/rtmp/rand"
@@ -53,7 +54,7 @@ type MediaServer interface {
 	onAck(sequenceNumber uint32)
 	onSetWindowAckSize(windowAckSize uint32)
 	onSetBandwidth(windowAckSize uint32, limitType uint8)
-	onConnect(csID uint32, transactionId float64, data map[string]any)
+	onConnect(csID uint32, transactionId float64, data amf.Metadata)
 	onReleaseStream(csID uint32, transactionId float64, args map[string]any, streamKey string)
 	onFCPublish(csID uint32, transactionId float64, args map[string]any, streamKey string)
 	onCreateStream(csID uint32, transactionId float64, data map[string]any)
@@ -95,7 +96,7 @@ type Session struct {
 	flashVer       string
 	swfUrl         string
 	tcUrl          string
-	typeOfStream   string
+	amfType        string
 	streamKey      string // used to identify user
 	publishingType string
 	isPublisher    bool
@@ -282,9 +283,9 @@ func (session *Session) GetID() string {
 func (session *Session) onWindowAckSizeReached(sequenceNumber uint32) {
 }
 
-func (session *Session) onConnect(csID uint32, transactionID float64, data map[string]any) {
+func (session *Session) onConnect(csID uint32, transactionID float64, data amf.Metadata) {
 	session.storeMetadata(data)
-	// If the app name to connect is App (whatever the user specifies in the config, ie. "app", "app/publish"),
+
 	if session.app == session.broadcaster.AppName() {
 		// Initiate connect sequence
 		// As per the specification, after the connect command, the server sends the protocol message Window Acknowledgment Size
@@ -304,31 +305,16 @@ func (session *Session) onConnect(csID uint32, transactionID float64, data map[s
 	}
 }
 
-func (session *Session) storeMetadata(metadata map[string]any) {
-	fmt.Printf("storeMetadata: %+v\n", metadata)
+func (session *Session) storeMetadata(metadata amf.Metadata) {
 	// Playback clients send other properties in the command object, such as what audio/video codecs the client supports
-	session.app = metadata["app"].(string)
-	if _, exists := metadata["flashVer"]; exists {
-		session.flashVer = metadata["flashVer"].(string)
-	} else if _, exists := metadata["flashver"]; exists {
-		session.flashVer = metadata["flashver"].(string)
-	}
+	// We skip client metadata for now
 
-	if _, exists := metadata["swfUrl"]; exists {
-		session.flashVer = metadata["swfUrl"].(string)
-	} else if _, exists := metadata["swfurl"]; exists {
-		session.flashVer = metadata["swfurl"].(string)
-	}
+	session.app, _ = metadata.GetString("app")
 
-	if _, exists := metadata["tcUrl"]; exists {
-		session.flashVer = metadata["tcUrl"].(string)
-	} else if _, exists := metadata["tcurl"]; exists {
-		session.flashVer = metadata["tcurl"].(string)
-	}
-
-	if _, exists := metadata["type"]; exists {
-		session.flashVer = metadata["type"].(string)
-	}
+	session.flashVer, _ = metadata.GetString("flashVer")
+	session.swfUrl, _ = metadata.GetString("swfUrl")
+	session.tcUrl, _ = metadata.GetString("tcUrl")
+	session.amfType, _ = metadata.GetString("type")
 }
 
 func (session *Session) onSetChunkSize(size uint32) {

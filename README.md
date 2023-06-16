@@ -2,7 +2,7 @@
 
 RTMP server written in Go (Golang) that allows stream publishing, forked
 from [torresjeff/rtmp](https://github.com/torresjeff/rtmp) to add more
-configuration for [Livewoof](https://twitter.com/livewoof) servers.
+config and flexibility for [Livewoof](https://twitter.com/livewoof).
 
 ## Install
 

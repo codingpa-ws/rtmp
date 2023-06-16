@@ -195,17 +195,6 @@ func (session *Session) StartPlayback() error {
 		"videoFunction": 1,
 	}
 
-	//n, err := session.socketw.Write([]byte("Hello, world!"))
-	//if err != nil {
-	//	fmt.Println("error writing hello, world!", err)
-	//}
-	//err = session.socketw.Flush()
-	//if err != nil {
-	//	fmt.Println("error flushing hello, world!", err)
-	//}
-	//fmt.Println("bytes written:", n)
-
-	fmt.Println("now requesting connect")
 	session.messageManager.sendSetChunkSize(constants.DefaultChunkSize)
 	// After handshake, request connection to an application
 	err = session.messageManager.requestConnect(info)

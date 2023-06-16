@@ -296,10 +296,9 @@ func (session *Session) onWindowAckSizeReached(sequenceNumber uint32) {
 }
 
 func (session *Session) onConnect(csID uint32, transactionID float64, data map[string]interface{}) {
-	fmt.Println("onConnect called")
 	session.storeMetadata(data)
 	// If the app name to connect is App (whatever the user specifies in the config, ie. "app", "app/publish"),
-	if session.app == config.App {
+	if session.app == session.broadcaster.AppName() {
 		// Initiate connect sequence
 		// As per the specification, after the connect command, the server sends the protocol message Window Acknowledgment Size
 		session.messageManager.sendWindowAckSize(constants.DefaultClientWindowSize)
@@ -402,6 +401,14 @@ func (session *Session) onPublish(transactionId float64, args map[string]interfa
 
 	session.streamKey = streamKey
 	session.publishingType = publishingType
+
+	if guard := session.broadcaster.GetSessionGuard(); guard != nil {
+		if !guard.Check(session) {
+			session.SendEndOfStream()
+			session.active = false
+			return
+		}
+	}
 
 	session.messageManager.sendStatusMessage("status", "NetStream.Publish.Start", "Publishing live_user_<x>")
 	session.isPublisher = true
@@ -506,4 +513,8 @@ func (session *Session) SendVideo(video []byte, timestamp uint32) {
 
 func (session *Session) SendMetadata(metadata map[string]interface{}) {
 	session.messageManager.sendMetadata(metadata)
+}
+
+func (session *Session) GetStreamKey() string {
+	return session.streamKey
 }

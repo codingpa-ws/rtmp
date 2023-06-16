@@ -128,3 +128,15 @@ func (b *broadcaster) BroadcastMetadata(streamKey string, metadata map[string]in
 	}
 	return nil
 }
+
+func (b *broadcaster) SetSessionGuard(guard SessionGuard) {
+	b.sessionGuard = guard
+}
+
+func (b *broadcaster) GetSessionGuard() SessionGuard {
+	return b.sessionGuard
+}
+
+func (b *broadcaster) AppName() string {
+	return b.appName
+}

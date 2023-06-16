@@ -8,7 +8,7 @@ import (
 type Metadata map[string]any
 
 func (m Metadata) Get(key string) any {
-	for k, _ := range m {
+	for k := range m {
 		if strings.EqualFold(k, key) {
 			return m[k]
 		}

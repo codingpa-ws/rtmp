@@ -1,6 +1,6 @@
 package amf0
 
-type ECMAArray map[string]interface{}
+type ECMAArray map[string]any
 type ObjectEnd struct{}
 
 const (

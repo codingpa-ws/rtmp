@@ -154,16 +154,16 @@ func generateConnectResponseSuccess(csID uint32) []byte {
 	commandName, _ := amf0.Encode("_result")
 	// Transaction ID is 1 for connection responses
 	transactionId, _ := amf0.Encode(1)
-	properties, _ := amf0.Encode(map[string]interface{}{
+	properties, _ := amf0.Encode(map[string]any{
 		"fmsVer":       constants.FlashMediaServerVersion,
 		"capabilities": constants.Capabilities,
 		"mode":         constants.Mode,
 	})
-	information, _ := amf0.Encode(map[string]interface{}{
+	information, _ := amf0.Encode(map[string]any{
 		"code":        NetConnectionSucces,
 		"level":       "status",
 		"description": "Connection accepted.",
-		"data": map[string]interface{}{
+		"data": map[string]any{
 			"string": "3,5,7,7009",
 		},
 		"objectEncoding": 0, // AMFVersion0
@@ -213,7 +213,7 @@ func generateOnFCPublishMessage(csID uint32, transactionID float64, streamKey st
 	onFCPublishString, _ := amf0.Encode("onFCPublish")
 	tId, _ := amf0.Encode(0)
 	commandObject, _ := amf0.Encode(nil)
-	information, _ := amf0.Encode(map[string]interface{}{
+	information, _ := amf0.Encode(map[string]any{
 		"level":       "status",
 		"code":        "NetStream.Publish.Start",
 		"description": "FCPublish to stream " + streamKey,
@@ -247,7 +247,7 @@ func generateOnFCPublishMessage(csID uint32, transactionID float64, streamKey st
 	return onFCPublishMessage
 }
 
-func generateCreateStreamResponse(csID uint32, transactionID float64, commandObject map[string]interface{}) []byte {
+func generateCreateStreamResponse(csID uint32, transactionID float64, commandObject map[string]any) []byte {
 	result, _ := amf0.Encode("_result")
 	tID, _ := amf0.Encode(transactionID)
 	commandObjectResponse, _ := amf0.Encode(nil)
@@ -284,7 +284,7 @@ func generateCreateStreamResponse(csID uint32, transactionID float64, commandObj
 	return createStreamResponseMessage
 }
 
-func generateConnectRequest(csID int, transactionID int, info map[string]interface{}) []byte {
+func generateConnectRequest(csID int, transactionID int, info map[string]any) []byte {
 	connect, _ := amf0.Encode("connect")
 	tID, _ := amf0.Encode(transactionID)
 	cmdObj, _ := amf0.Encode(info)
@@ -345,7 +345,7 @@ func generateCreateStreamRequest(transactionID int) []byte {
 	return createStreamMessage
 }
 
-func generateMetadataMessage(metadata map[string]interface{}, streamID uint32) []byte {
+func generateMetadataMessage(metadata map[string]any, streamID uint32) []byte {
 	setDataFrame, _ := amf0.Encode("@setDataFrame")
 	onMetadata, _ := amf0.Encode("onMetadata")
 	metadataObj, _ := amf0.Encode(amf0.ECMAArray(metadata))
@@ -412,7 +412,7 @@ func generatePlayRequest(streamKey string, streamID uint32) []byte {
 	return playMessage
 }
 
-func generateStatusMessage(transactionID float64, streamID uint32, infoObject map[string]interface{}) []byte {
+func generateStatusMessage(transactionID float64, streamID uint32, infoObject map[string]any) []byte {
 
 	commandName, _ := amf0.Encode("onStatus")
 	tID, _ := amf0.Encode(transactionID)

@@ -6,7 +6,7 @@ import "fmt"
 type Subscriber interface {
 	SendAudio(audio []byte, timestamp uint32)
 	SendVideo(video []byte, timestamp uint32)
-	SendMetadata(metadata map[string]interface{})
+	SendMetadata(metadata map[string]any)
 	GetID() string
 	SendEndOfStream()
 }
@@ -14,7 +14,7 @@ type Subscriber interface {
 type Broadcaster interface {
 	BroadcastAudio(streamKey string, audio []byte, timestamp uint32) error
 	BroadcastEndOfStream(streamKey string)
-	BroadcastMetadata(streamKey string, metadata map[string]interface{}) error
+	BroadcastMetadata(streamKey string, metadata map[string]any) error
 	BroadcastVideo(streamKey string, video []byte, timestamp uint32) error
 	DestroyPublisher(streamKey string) error
 	DestroySubscriber(streamKey string, sessionID string) error
@@ -116,7 +116,7 @@ func (b *broadcaster) BroadcastEndOfStream(streamKey string) {
 	}
 }
 
-func (b *broadcaster) BroadcastMetadata(streamKey string, metadata map[string]interface{}) error {
+func (b *broadcaster) BroadcastMetadata(streamKey string, metadata map[string]any) error {
 	subscribers, err := b.context.GetSubscribersForStream(streamKey)
 	if err != nil {
 		fmt.Println("broadcaster: BroadcastVideo: error getting subscribers for stream, " + err.Error())

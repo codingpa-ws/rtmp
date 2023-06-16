@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Encode(v interface{}) ([]byte, error) {
+func Encode(v any) ([]byte, error) {
 	switch v.(type) {
 	case float64:
 		return encodeNumber(v.(float64)), nil
@@ -19,8 +19,8 @@ func Encode(v interface{}) ([]byte, error) {
 		return encodeBoolean(v.(bool)), nil
 	case string:
 		return encodeString(v.(string)), nil
-	case map[string]interface{}:
-		return encodeObject(v.(map[string]interface{})), nil
+	case map[string]any:
+		return encodeObject(v.(map[string]any)), nil
 	case nil:
 		return encodeNull(), nil
 	case ECMAArray:
@@ -62,7 +62,7 @@ func encodeNull() []byte {
 	return buf[:]
 }
 
-func encodeObject(m map[string]interface{}) []byte {
+func encodeObject(m map[string]any) []byte {
 	buf := &bytes.Buffer{}
 	for key := range m {
 		// Encode property name

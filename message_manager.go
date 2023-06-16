@@ -210,12 +210,12 @@ func (m *MessageManager) handleCommandAmf0(csID uint32, streamID uint32, command
 	// Update our payload to read the next property (commandObject)
 	payload = payload[byteLength:]
 	cmdObject, _ := amf0.Decode(payload)
-	var commandObject map[string]interface{}
+	var commandObject map[string]any
 	switch cmdObject.(type) {
 	case nil:
 		commandObject = nil
-	case map[string]interface{}:
-		commandObject = cmdObject.(map[string]interface{})
+	case map[string]any:
+		commandObject = cmdObject.(map[string]any)
 	case amf0.ECMAArray:
 		commandObject = cmdObject.(amf0.ECMAArray)
 	}
@@ -268,10 +268,10 @@ func (m *MessageManager) handleCommandAmf0(csID uint32, streamID uint32, command
 		m.session.onDeleteStream(commandObject, streamID.(float64))
 	case "_result":
 		info, _ := amf0.Decode(payload)
-		m.session.onResult(info.(map[string]interface{}))
+		m.session.onResult(info.(map[string]any))
 	case "onStatus":
 		info, _ := amf0.Decode(payload)
-		m.session.onStatus(info.(map[string]interface{}))
+		m.session.onStatus(info.(map[string]any))
 	default:
 		fmt.Println("message manager: received command " + commandName + ", but couldn't handle it because no implementation is defined")
 	}
@@ -308,8 +308,8 @@ func (m *MessageManager) handleDataMessageAmf0(dataName string, payload []byte) 
 		switch metadata.(type) {
 		case amf0.ECMAArray:
 			m.session.onMetadata(metadata.(amf0.ECMAArray))
-		case map[string]interface{}:
-			m.session.onMetadata(metadata.(map[string]interface{}))
+		case map[string]any:
+			m.session.onMetadata(metadata.(map[string]any))
 		}
 		return nil
 	default:
@@ -500,12 +500,12 @@ func (m *MessageManager) sendVideo(video []byte, timestamp uint32) {
 	//fmt.Println("bytes written:", n)
 }
 
-func (m *MessageManager) sendMetadata(metadata map[string]interface{}) {
+func (m *MessageManager) sendMetadata(metadata map[string]any) {
 	message := generateMetadataMessage(metadata, m.streamID)
 	m.chunkHandler.send(message[:12], message[12:])
 }
 
-func (m *MessageManager) sendPlayStart(info map[string]interface{}) {
+func (m *MessageManager) sendPlayStart(info map[string]any) {
 	message := generateStatusMessage(4, 1, info)
 	m.chunkHandler.sendBytes(message)
 }
@@ -516,7 +516,7 @@ func (m *MessageManager) sendRtmpSampleAccess(audio bool, video bool) {
 }
 
 func (m *MessageManager) sendStatusMessage(level string, code string, description string, optionalDetails ...string) {
-	infoObject := map[string]interface{}{
+	infoObject := map[string]any{
 		"level":       level,
 		"code":        code,
 		"description": description,
@@ -572,12 +572,12 @@ func (m *MessageManager) sendOnFCPublish(csID uint32, transactionID float64, str
 	}
 }
 
-func (m *MessageManager) sendCreateStreamResponse(csID uint32, transactionID float64, data map[string]interface{}) {
+func (m *MessageManager) sendCreateStreamResponse(csID uint32, transactionID float64, data map[string]any) {
 	message := generateCreateStreamResponse(csID, transactionID, data)
 	m.chunkHandler.sendBytes(message)
 }
 
-func (m *MessageManager) requestConnect(info map[string]interface{}) error {
+func (m *MessageManager) requestConnect(info map[string]any) error {
 	message := generateConnectRequest(3, 1, info)
 	err := m.chunkHandler.send(message[:12], message[12:])
 	return err

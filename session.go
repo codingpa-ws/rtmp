@@ -12,7 +12,7 @@ import (
 
 type AudioCallback func(format audio.Format, sampleRate audio.SampleRate, sampleSize audio.SampleSize, channels audio.Channel, payload []byte, timestamp uint32)
 type VideoCallback func(frameType video.FrameType, codec video.Codec, payload []byte, timestamp uint32)
-type MetadataCallback func(metadata map[string]interface{})
+type MetadataCallback func(metadata map[string]any)
 
 type surroundSound struct {
 	stereoSound        bool
@@ -53,23 +53,23 @@ type MediaServer interface {
 	onAck(sequenceNumber uint32)
 	onSetWindowAckSize(windowAckSize uint32)
 	onSetBandwidth(windowAckSize uint32, limitType uint8)
-	onConnect(csID uint32, transactionId float64, data map[string]interface{})
-	onReleaseStream(csID uint32, transactionId float64, args map[string]interface{}, streamKey string)
-	onFCPublish(csID uint32, transactionId float64, args map[string]interface{}, streamKey string)
-	onCreateStream(csID uint32, transactionId float64, data map[string]interface{})
-	onPublish(transactionId float64, args map[string]interface{}, streamKey string, publishingType string)
-	onFCUnpublish(args map[string]interface{}, streamKey string)
-	onDeleteStream(args map[string]interface{}, streamID float64)
-	onCloseStream(csID uint32, transactionId float64, args map[string]interface{})
+	onConnect(csID uint32, transactionId float64, data map[string]any)
+	onReleaseStream(csID uint32, transactionId float64, args map[string]any, streamKey string)
+	onFCPublish(csID uint32, transactionId float64, args map[string]any, streamKey string)
+	onCreateStream(csID uint32, transactionId float64, data map[string]any)
+	onPublish(transactionId float64, args map[string]any, streamKey string, publishingType string)
+	onFCUnpublish(args map[string]any, streamKey string)
+	onDeleteStream(args map[string]any, streamID float64)
+	onCloseStream(csID uint32, transactionId float64, args map[string]any)
 	onAudioMessage(format audio.Format, sampleRate audio.SampleRate, sampleSize audio.SampleSize, channels audio.Channel, payload []byte, timestamp uint32)
 	onVideoMessage(frameType video.FrameType, codec video.Codec, payload []byte, timestamp uint32)
-	onMetadata(metadata map[string]interface{})
+	onMetadata(metadata map[string]any)
 	onPlay(streamKey string, startTime float64)
 
 	// TODO: separate into two distinct interfaces: client, server (maybe 3 for common functions like onAck, onSetWindowAckSize, onSetChunkSize, etc.)
 	// Client callbacks
-	onResult(info map[string]interface{})
-	onStatus(info map[string]interface{})
+	onResult(info map[string]any)
+	onStatus(info map[string]any)
 	onStreamBegin()
 }
 
@@ -184,7 +184,7 @@ func (session *Session) StartPlayback() error {
 		fmt.Println("client handshake completed successfully")
 	}
 
-	info := map[string]interface{}{
+	info := map[string]any{
 		"app":           session.app,
 		"flashVer":      "LNX 9,0,124,2",
 		"tcUrl":         session.tcUrl,
@@ -214,7 +214,7 @@ func (session *Session) StartPlayback() error {
 	}
 }
 
-func (session *Session) onResult(info map[string]interface{}) {
+func (session *Session) onResult(info map[string]any) {
 	level, exists := info["level"]
 	if !exists {
 		fmt.Println("session: onResult: no 'level' in info object")
@@ -245,7 +245,7 @@ func (session *Session) onStreamBegin() {
 	session.messageManager.requestPlay(session.streamKey)
 }
 
-func (session *Session) onStatus(info map[string]interface{}) {
+func (session *Session) onStatus(info map[string]any) {
 	level, exists := info["level"]
 	if !exists {
 		fmt.Println("session: onStatus: no 'level' in info object")
@@ -282,7 +282,7 @@ func (session *Session) GetID() string {
 func (session *Session) onWindowAckSizeReached(sequenceNumber uint32) {
 }
 
-func (session *Session) onConnect(csID uint32, transactionID float64, data map[string]interface{}) {
+func (session *Session) onConnect(csID uint32, transactionID float64, data map[string]any) {
 	session.storeMetadata(data)
 	// If the app name to connect is App (whatever the user specifies in the config, ie. "app", "app/publish"),
 	if session.app == session.broadcaster.AppName() {
@@ -304,7 +304,7 @@ func (session *Session) onConnect(csID uint32, transactionID float64, data map[s
 	}
 }
 
-func (session *Session) storeMetadata(metadata map[string]interface{}) {
+func (session *Session) storeMetadata(metadata map[string]any) {
 	fmt.Printf("storeMetadata: %+v\n", metadata)
 	// Playback clients send other properties in the command object, such as what audio/video codecs the client supports
 	session.app = metadata["app"].(string)
@@ -349,7 +349,7 @@ func (session *Session) onSetBandwidth(windowAckSize uint32, limitType uint8) {
 	session.messageManager.SetBandwidth(windowAckSize, limitType)
 }
 
-func (session *Session) onMetadata(metadata map[string]interface{}) {
+func (session *Session) onMetadata(metadata map[string]any) {
 	// This is not for the RTMP server. RTMP servers don't have the option to specify callback. Only RTMP clients use this for now
 	if session.OnMetadata != nil {
 		session.OnMetadata(metadata)
@@ -368,20 +368,20 @@ func (session *Session) onMetadata(metadata map[string]interface{}) {
 	//}
 }
 
-func (session *Session) onReleaseStream(csID uint32, transactionID float64, args map[string]interface{}, streamKey string) {
+func (session *Session) onReleaseStream(csID uint32, transactionID float64, args map[string]any, streamKey string) {
 }
 
-func (session *Session) onFCPublish(csID uint32, transactionID float64, args map[string]interface{}, streamKey string) {
+func (session *Session) onFCPublish(csID uint32, transactionID float64, args map[string]any, streamKey string) {
 	session.messageManager.sendOnFCPublish(csID, transactionID, streamKey)
 }
 
-func (session *Session) onCreateStream(csID uint32, transactionID float64, data map[string]interface{}) {
+func (session *Session) onCreateStream(csID uint32, transactionID float64, data map[string]any) {
 	// data object could be nil
 	session.messageManager.sendCreateStreamResponse(csID, transactionID, data)
 	session.messageManager.sendBeginStream(uint32(constants.DefaultStreamID))
 }
 
-func (session *Session) onPublish(transactionId float64, args map[string]interface{}, streamKey string, publishingType string) {
+func (session *Session) onPublish(transactionId float64, args map[string]any, streamKey string, publishingType string) {
 	// TODO: Handle things like look up the user's stream key, check if it's valid.
 	// TODO: For example: twitch returns "Publishing live_user_<username>" in the description.
 	// TODO: Handle things like recording into a file if publishingType = "record" or "append". Or always record?
@@ -402,17 +402,17 @@ func (session *Session) onPublish(transactionId float64, args map[string]interfa
 	session.broadcaster.RegisterPublisher(streamKey)
 }
 
-func (session *Session) onFCUnpublish(args map[string]interface{}, streamKey string) {
+func (session *Session) onFCUnpublish(args map[string]any, streamKey string) {
 }
 
-func (session *Session) onDeleteStream(args map[string]interface{}, streamID float64) {
+func (session *Session) onDeleteStream(args map[string]any, streamID float64) {
 }
 
 func (session *Session) SendEndOfStream() {
 	session.messageManager.sendStatusMessage("status", "NetStream.Play.Stop", "Stopped playing stream.")
 }
 
-func (session *Session) onCloseStream(csID uint32, transactionId float64, args map[string]interface{}) {
+func (session *Session) onCloseStream(csID uint32, transactionId float64, args map[string]any) {
 
 }
 
@@ -498,7 +498,7 @@ func (session *Session) SendVideo(video []byte, timestamp uint32) {
 	session.messageManager.sendVideo(video, timestamp)
 }
 
-func (session *Session) SendMetadata(metadata map[string]interface{}) {
+func (session *Session) SendMetadata(metadata map[string]any) {
 	session.messageManager.sendMetadata(metadata)
 }
 

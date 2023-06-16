@@ -11,9 +11,9 @@ import (
 )
 
 // Decode returns the original form of the encoded value, or an error if any occurred.
-// Possible return types: float64, bool, string, map[string]interface{}, nil, amf0.ECMAArray, time.Time
+// Possible return types: float64, bool, string, map[string]any, nil, amf0.ECMAArray, time.Time
 // If the contents of b represent a Number (either int or float), it will be returned as a float64
-func Decode(bytes []byte) (interface{}, error) {
+func Decode(bytes []byte) (any, error) {
 	// End of object
 	if bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == TypeObjectEnd {
 		return ObjectEnd{}, nil
@@ -66,7 +66,7 @@ func decodeECMAArray(bytes []byte) ECMAArray {
 // Size returns the number of bytes the value v has in its AMF0 representation.
 // Eg: a value v of "test" will return 7 (3 bytes for the header, 4 bytes for the string Size)
 // Eg: a value v of 5 will return 9 (1 byte for the header, 8 bytes for the number)
-func Size(v interface{}) uint64 {
+func Size(v any) uint64 {
 	switch v.(type) {
 	case float64:
 		// A float64 spans 9 bytes (1 header byte + 8 data bytes)
@@ -85,10 +85,10 @@ func Size(v interface{}) uint64 {
 			// If it is a long string, its Size is 5 + n (5 header bytes + string Size)
 			return 5 + length
 		}
-	case map[string]interface{}:
+	case map[string]any:
 		// Calculate object Size recursively
 		var objSize uint64
-		for k, val := range v.(map[string]interface{}) {
+		for k, val := range v.(map[string]any) {
 			objSize += Size(k) - 1 // objects don't store the TypeString (0x02) header in the key
 			objSize += Size(val)
 		}
@@ -115,8 +115,8 @@ func isEndOfObject(bytes []byte) bool {
 	return len(bytes) >= 3 && bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == TypeObjectEnd
 }
 
-func decodeObject(bytes []byte) map[string]interface{} {
-	m := make(map[string]interface{})
+func decodeObject(bytes []byte) map[string]any {
+	m := make(map[string]any)
 
 	// Decode until an end of object is reached
 	for {

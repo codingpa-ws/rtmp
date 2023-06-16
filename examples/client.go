@@ -17,7 +17,7 @@ func OnVideo(frameType video.FrameType, codec video.Codec, payload []byte, times
 	fmt.Println("client: on video")
 }
 
-func OnMetadata(metadata map[string]interface{}) {
+func OnMetadata(metadata map[string]any) {
 	fmt.Printf("client: on metadata: %+v", metadata)
 }
 

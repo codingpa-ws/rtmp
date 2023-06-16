@@ -10,7 +10,7 @@ import (
 // Encodes the value v into its AMF3 form.
 // If you encode a signed/unsigned int greater than MaxInt, it will be encoded as a double.
 // If you encode a signed int less than MinInt, it will be encoded as a double.
-func Encode(v interface{}) ([]byte, error) {
+func Encode(v any) ([]byte, error) {
 	switch v.(type) {
 	case nil:
 		return encodeNull(), nil
@@ -24,17 +24,17 @@ func Encode(v interface{}) ([]byte, error) {
 	//	return encodeString(v.(string)), nil
 	case time.Time:
 		return encodeDate(v.(time.Time)), nil
-	//case []interface{}: // TODO: implement
-	//	return encodeArray(v.([]interface{})), nil
-	//case map[string]interface{}:
-	//	return encodeObject(v.(map[string]interface{})), nil
+	//case []any: // TODO: implement
+	//	return encodeArray(v.([]any)), nil
+	//case map[string]any:
+	//	return encodeObject(v.(map[string]any)), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("cannot encode type %T", v))
 	}
 }
 
 // TODO: implement
-func encodeObject(i map[string]interface{}) []byte {
+func encodeObject(i map[string]any) []byte {
 	return nil
 }
 

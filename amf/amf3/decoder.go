@@ -1,6 +1,6 @@
 package amf3
 
-//func Decode(bytes []byte) (interface{}, error) {
+//func Decode(bytes []byte) (any, error) {
 //	switch bytes[0] {
 //	case TypeInteger:
 //		return decodeInteger(bytes[1:]), nil

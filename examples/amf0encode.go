@@ -28,10 +28,10 @@ func main() {
 		"age":  4,
 		"name": "Jefff",
 		//"timeee": time.Now(),
-		"objjj": map[string]interface{}{
+		"objjj": map[string]any{
 			"ffff": 2321.543,
 			"aaa":  true,
-			"obj2": map[string]interface{}{
+			"obj2": map[string]any{
 				"time": time.Now(),
 			},
 		},

@@ -3,26 +3,26 @@ package rtmp
 import (
 	"bufio"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/torresjeff/rtmp/config"
-	"go.uber.org/zap"
 	"io"
 	"net"
+
+	"github.com/pkg/errors"
+	"github.com/torresjeff/rtmp/constants"
+	"go.uber.org/zap"
 )
 
 // Server represents the RTMP server, where a client/app can stream media to. The server listens for incoming connections.
 type Server struct {
-	Addr string
-	// TODO: create Logger interface to not depend on zap directly
+	AppName     string
+	Addr        string
 	Logger      *zap.Logger
-	Broadcaster *Broadcaster
-	// TODO: should probably add something like maxConns
+	Broadcaster Broadcaster
 }
 
 // Listen starts the server and listens for any incoming connections. If no Addr (host:port) has been assigned to the server, ":1935" is used.
 func (s *Server) Listen() error {
 	if s.Addr == "" {
-		s.Addr = ":" + config.DefaultPort
+		s.Addr = ":" + constants.DefaultPort
 	}
 
 	tcpAddress, err := net.ResolveTCPAddr("tcp", s.Addr)
@@ -51,8 +51,8 @@ func (s *Server) Listen() error {
 		go func(conn net.Conn) {
 			defer conn.Close()
 
-			socketr := bufio.NewReaderSize(conn, config.BuffioSize)
-			socketw := bufio.NewWriterSize(conn, config.BuffioSize)
+			socketr := bufio.NewReaderSize(conn, constants.BuffioSize)
+			socketw := bufio.NewWriterSize(conn, constants.BuffioSize)
 			sess := NewSession(s.Logger, s.Broadcaster)
 
 			sess.messageManager = NewMessageManager(sess,

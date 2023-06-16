@@ -3,8 +3,9 @@ package rtmp
 import (
 	"errors"
 	"fmt"
-	"github.com/torresjeff/rtmp/config"
 	"sync"
+
+	"github.com/torresjeff/rtmp/constants"
 )
 
 type ContextStore interface {
@@ -45,7 +46,7 @@ func (c *InMemoryContext) RegisterPublisher(streamKey string) error {
 	// Assume there will be a small amount of subscribers (ie. a few instances of ffmpeg that transcode our audio/video)
 	c.subMutex.Lock()
 	c.subscribers[streamKey] = make([]Subscriber, 0, 5)
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("context: registered publisher with stream key", streamKey)
 	}
 	c.numberOfSessions++

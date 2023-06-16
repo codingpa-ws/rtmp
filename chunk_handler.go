@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/torresjeff/rtmp/config"
 	"io"
+
+	"github.com/pkg/errors"
+	"github.com/torresjeff/rtmp/constants"
 )
 
 var InvalidChunkType error = errors.New("chunk handler: unknown chunk type")
@@ -421,7 +422,7 @@ func (chunkHandler *ChunkHandler) sendAck() {
 }
 
 func (chunkHandler *ChunkHandler) SetChunkSize(size uint32) {
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("Set chunk size to", size)
 	}
 	chunkHandler.inChunkSize = size
@@ -429,7 +430,7 @@ func (chunkHandler *ChunkHandler) SetChunkSize(size uint32) {
 
 // Sets the window acknowledgement size to the new size
 func (chunkHandler *ChunkHandler) SetWindowAckSize(size uint32) {
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("Set window ack size to", size)
 	}
 	// If no acknowledgement has been sent since the beginning of the session, send it

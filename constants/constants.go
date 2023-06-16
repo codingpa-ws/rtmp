@@ -1,12 +1,11 @@
-package config
+package constants
 
 const DefaultPort = "1935"
 
-var Debug = true
+var Debug = false
 
 const BuffioSize = 1024 * 64
 
-const App = "app"
 const DefaultClientWindowSize uint32 = 2500000
 const DefaultPublishStream uint32 = 0
 const DefaultChunkSize uint32 = 4096

@@ -4,9 +4,10 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
 	"github.com/torresjeff/rtmp/amf/amf0"
 	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/config"
+	"github.com/torresjeff/rtmp/constants"
 	"github.com/torresjeff/rtmp/video"
 )
 
@@ -131,7 +132,7 @@ func (m *MessageManager) interpretMessage(header ChunkHeader, payload []byte) er
 func (m *MessageManager) handleControlMessage(header *ChunkHeader, payload []byte) error {
 	switch header.MessageHeader.MessageTypeID {
 	case SetChunkSize:
-		if config.Debug {
+		if constants.Debug {
 			fmt.Println("Received SetChunkSize control message")
 		}
 		// The payload of a set chunk size message is the new chunk size
@@ -199,7 +200,7 @@ func (m *MessageManager) handleCommandMessage(csID uint32, streamID uint32, comm
 }
 
 func (m *MessageManager) handleCommandAmf0(csID uint32, streamID uint32, commandName string, payload []byte) {
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("received command", commandName)
 	}
 	// Every command has a transaction ID and a command object (which can be null)

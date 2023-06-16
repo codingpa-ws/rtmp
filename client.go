@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/torresjeff/rtmp/config"
 	"io"
 	"net"
 	"net/url"
 	"strings"
+
+	"github.com/torresjeff/rtmp/constants"
 )
 
 var ErrInvalidScheme error = errors.New("invalid scheme in URL")
@@ -32,7 +33,7 @@ func (c *Client) Connect(addr string) error {
 	// Always assign rtmp as the scheme
 	u.Scheme = "rtmp"
 	if u.Port() == "" {
-		u.Host += ":" + config.DefaultPort
+		u.Host += ":" + constants.DefaultPort
 	}
 	c.url = u
 	c.raddr = u.Host
@@ -53,7 +54,7 @@ func (c *Client) Connect(addr string) error {
 	// The stream key is the last element of the path
 	c.streamKey = path[elements-1]
 
-	if config.Debug {
+	if constants.Debug {
 		fmt.Printf("app: \"%s\", streamKey: \"%s\"\n", c.app, c.streamKey)
 	}
 	conn, err := net.Dial("tcp", c.raddr)
@@ -63,12 +64,12 @@ func (c *Client) Connect(addr string) error {
 
 	defer conn.Close()
 
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("client: connected to", conn.RemoteAddr().String())
 	}
 
-	socketr := bufio.NewReaderSize(conn, config.BuffioSize)
-	socketw := bufio.NewWriterSize(conn, config.BuffioSize)
+	socketr := bufio.NewReaderSize(conn, constants.BuffioSize)
+	socketw := bufio.NewWriterSize(conn, constants.BuffioSize)
 	tcUrl := "rtmp://" + conn.RemoteAddr().String() + "/" + c.app
 	client := NewClientSession(c.app, tcUrl, c.streamKey, c.OnAudio, c.OnVideo, c.OnMetadata)
 	client.messageManager = NewMessageManager(client, NewHandshaker(socketr, socketw), NewChunkHandler(socketr, socketw))

@@ -2,8 +2,9 @@ package rtmp
 
 import (
 	"encoding/binary"
+
 	"github.com/torresjeff/rtmp/amf/amf0"
-	"github.com/torresjeff/rtmp/config"
+	"github.com/torresjeff/rtmp/constants"
 )
 
 const NetConnectionSucces = "NetConnection.Connect.Success"
@@ -154,9 +155,9 @@ func generateConnectResponseSuccess(csID uint32) []byte {
 	// Transaction ID is 1 for connection responses
 	transactionId, _ := amf0.Encode(1)
 	properties, _ := amf0.Encode(map[string]interface{}{
-		"fmsVer":       config.FlashMediaServerVersion,
-		"capabilities": config.Capabilities,
-		"mode":         config.Mode,
+		"fmsVer":       constants.FlashMediaServerVersion,
+		"capabilities": constants.Capabilities,
+		"mode":         constants.Mode,
 	})
 	information, _ := amf0.Encode(map[string]interface{}{
 		"code":        NetConnectionSucces,
@@ -253,7 +254,7 @@ func generateCreateStreamResponse(csID uint32, transactionID float64, commandObj
 	// ID of the stream that was opened. We could also send an object with additional information if an error occurred, instead of a number.
 	// Subsequent chunks will be sent by the client on the stream ID specified here.
 	// TODO: is this a fixed value?
-	streamID, _ := amf0.Encode(config.DefaultStreamID)
+	streamID, _ := amf0.Encode(constants.DefaultStreamID)
 	bodyLength := len(result) + len(tID) + len(commandObjectResponse) + len(streamID)
 
 	createStreamResponseMessage := make([]byte, 12, 50)

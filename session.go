@@ -2,8 +2,9 @@ package rtmp
 
 import (
 	"fmt"
+
 	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/config"
+	"github.com/torresjeff/rtmp/constants"
 	"github.com/torresjeff/rtmp/rand"
 	"github.com/torresjeff/rtmp/video"
 	"go.uber.org/zap"
@@ -141,22 +142,25 @@ func (session *Session) Start() error {
 	defer func() {
 		// Remove the session from the context
 		if session.isPlayer {
-			if config.Debug {
+			if constants.Debug {
 				fmt.Println("session: destroying subscriber")
 			}
 			session.broadcaster.DestroySubscriber(session.streamKey, session.sessionID)
 		}
 		if session.isPublisher {
-			if config.Debug {
+			if constants.Debug {
 				fmt.Println("session: destroying publisher")
 			}
 			// Broadcast end of stream
 			session.broadcaster.BroadcastEndOfStream(session.streamKey)
 			session.broadcaster.DestroyPublisher(session.streamKey)
+			if guard := session.broadcaster.GetSessionGuard(); guard != nil {
+				guard.End(session)
+			}
 		}
 	}()
 
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("Handshake completed successfully")
 	}
 
@@ -178,7 +182,7 @@ func (session *Session) StartPlayback() error {
 	if err != nil {
 		return err
 	}
-	if config.Debug {
+	if constants.Debug {
 		fmt.Println("client handshake completed successfully")
 	}
 
@@ -204,7 +208,7 @@ func (session *Session) StartPlayback() error {
 	//fmt.Println("bytes written:", n)
 
 	fmt.Println("now requesting connect")
-	session.messageManager.sendSetChunkSize(config.DefaultChunkSize)
+	session.messageManager.sendSetChunkSize(constants.DefaultChunkSize)
 	// After handshake, request connection to an application
 	err = session.messageManager.requestConnect(info)
 	if err != nil {
@@ -298,14 +302,14 @@ func (session *Session) onConnect(csID uint32, transactionID float64, data map[s
 	if session.app == config.App {
 		// Initiate connect sequence
 		// As per the specification, after the connect command, the server sends the protocol message Window Acknowledgment Size
-		session.messageManager.sendWindowAckSize(config.DefaultClientWindowSize)
+		session.messageManager.sendWindowAckSize(constants.DefaultClientWindowSize)
 		// After sending the window ack size message, the server sends the set peer bandwidth message
-		session.messageManager.sendSetPeerBandWidth(config.DefaultClientWindowSize, LimitDynamic)
+		session.messageManager.sendSetPeerBandWidth(constants.DefaultClientWindowSize, LimitDynamic)
 		// Send the User Control Message to begin stream with stream ID = DefaultPublishStream (which is 0)
 		// Subsequent messages sent by the client will have stream ID = DefaultPublishStream, until another sendBeginStream message is sent
-		session.messageManager.sendBeginStream(config.DefaultPublishStream)
+		session.messageManager.sendBeginStream(constants.DefaultPublishStream)
 		// Send Set Chunk Size message
-		session.messageManager.sendSetChunkSize(config.DefaultChunkSize)
+		session.messageManager.sendSetChunkSize(constants.DefaultChunkSize)
 		// Send Connect Success response
 		session.messageManager.sendConnectSuccess(csID)
 	} else {
@@ -373,7 +377,7 @@ func (session *Session) onMetadata(metadata map[string]interface{}) {
 
 	// TODO: broadcast metadata to client
 	session.broadcaster.BroadcastMetadata(session.streamKey, metadata)
-	//if config.Debug {
+	//if constants.Debug {
 	//	fmt.Printf("clientMetadata %+v", session.clientMetadata)
 	//}
 }
@@ -388,7 +392,7 @@ func (session *Session) onFCPublish(csID uint32, transactionID float64, args map
 func (session *Session) onCreateStream(csID uint32, transactionID float64, data map[string]interface{}) {
 	// data object could be nil
 	session.messageManager.sendCreateStreamResponse(csID, transactionID, data)
-	session.messageManager.sendBeginStream(uint32(config.DefaultStreamID))
+	session.messageManager.sendBeginStream(uint32(constants.DefaultStreamID))
 }
 
 func (session *Session) onPublish(transactionId float64, args map[string]interface{}, streamKey string, publishingType string) {
@@ -471,7 +475,7 @@ func (session *Session) onPlay(streamKey string, startTime float64) {
 	session.messageManager.sendStatusMessage("status", "NetStream.Play.Start", "Playing stream for live_user_<x>")
 	avcSeqHeader := session.broadcaster.GetAvcSequenceHeaderForPublisher(streamKey)
 	if avcSeqHeader != nil {
-		if config.Debug {
+		if constants.Debug {
 			fmt.Printf("sending video onPlay, sequence header with timestamp: 0, body size: %d\n", len(avcSeqHeader))
 		}
 		session.messageManager.sendVideo(avcSeqHeader, 0)
@@ -479,7 +483,7 @@ func (session *Session) onPlay(streamKey string, startTime float64) {
 
 	aacSeqHeader := session.broadcaster.GetAacSequenceHeaderForPublisher(streamKey)
 	if aacSeqHeader != nil {
-		if config.Debug {
+		if constants.Debug {
 			fmt.Printf("sending audio onPlay, sequence header with timestamp: 0, body size: %d\n", len(aacSeqHeader))
 		}
 		session.messageManager.sendAudio(aacSeqHeader, 0)

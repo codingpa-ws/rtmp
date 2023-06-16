@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/torresjeff/rtmp/constants"
+	"github.com/codingpa-ws/rtmp/constants"
 )
 
 var ErrInvalidScheme error = errors.New("invalid scheme in URL")

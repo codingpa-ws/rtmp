@@ -16,7 +16,7 @@ Start up a server for the ingestion/playback of an RTMP stream (default port is 
 package main
 
 import (
-	"github.com/torresjeff/rtmp"
+	"github.com/codingpa-ws/rtmp"
 	"log"
 )
 
@@ -33,9 +33,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/torresjeff/rtmp"
-	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/video"
+	"github.com/codingpa-ws/rtmp"
+	"github.com/codingpa-ws/rtmp/audio"
+	"github.com/codingpa-ws/rtmp/video"
 	"log"
 )
 

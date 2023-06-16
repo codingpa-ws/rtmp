@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/torresjeff/rtmp"
-	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/video"
 	"log"
+
+	"github.com/codingpa-ws/rtmp"
+	"github.com/codingpa-ws/rtmp/audio"
+	"github.com/codingpa-ws/rtmp/video"
 )
 
 func OnAudio(format audio.Format, sampleRate audio.SampleRate, sampleSize audio.SampleSize, channels audio.Channel, payload []byte, timestamp uint32) {

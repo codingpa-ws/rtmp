@@ -3,10 +3,10 @@ package rtmp
 import (
 	"fmt"
 
-	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/constants"
-	"github.com/torresjeff/rtmp/rand"
-	"github.com/torresjeff/rtmp/video"
+	"github.com/codingpa-ws/rtmp/audio"
+	"github.com/codingpa-ws/rtmp/constants"
+	"github.com/codingpa-ws/rtmp/rand"
+	"github.com/codingpa-ws/rtmp/video"
 	"go.uber.org/zap"
 )
 

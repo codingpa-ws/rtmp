@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/torresjeff/rtmp/rand"
 	"io"
+
+	"github.com/codingpa-ws/rtmp/rand"
 )
 
 var ErrUnsupportedRTMPVersion error = errors.New("The version of RTMP is not supported")

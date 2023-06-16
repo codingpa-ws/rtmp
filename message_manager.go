@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/torresjeff/rtmp/amf/amf0"
-	"github.com/torresjeff/rtmp/audio"
-	"github.com/torresjeff/rtmp/constants"
-	"github.com/torresjeff/rtmp/video"
+	"github.com/codingpa-ws/rtmp/amf/amf0"
+	"github.com/codingpa-ws/rtmp/audio"
+	"github.com/codingpa-ws/rtmp/constants"
+	"github.com/codingpa-ws/rtmp/video"
 )
 
 // Control message types

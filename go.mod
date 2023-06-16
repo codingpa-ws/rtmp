@@ -1,4 +1,4 @@
-module github.com/torresjeff/rtmp
+module github.com/codingpa-ws/rtmp
 
 go 1.14
 

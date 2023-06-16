@@ -3,8 +3,8 @@ package rtmp
 import (
 	"encoding/binary"
 
-	"github.com/torresjeff/rtmp/amf/amf0"
-	"github.com/torresjeff/rtmp/constants"
+	"github.com/codingpa-ws/rtmp/amf/amf0"
+	"github.com/codingpa-ws/rtmp/constants"
 )
 
 const NetConnectionSucces = "NetConnection.Connect.Success"

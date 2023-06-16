@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/codingpa-ws/rtmp/constants"
 	"github.com/pkg/errors"
-	"github.com/torresjeff/rtmp/constants"
 )
 
 var InvalidChunkType error = errors.New("chunk handler: unknown chunk type")

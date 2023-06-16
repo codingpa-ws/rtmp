@@ -77,7 +77,7 @@ type MediaServer interface {
 type Session struct {
 	MediaServer
 	logger         *zap.Logger
-	sessionID      string
+	id             string
 	clientMetadata clientMetadata
 	broadcaster    Broadcaster
 	active         bool
@@ -107,7 +107,7 @@ type Session struct {
 func NewSession(logger *zap.Logger, b Broadcaster) *Session {
 	session := &Session{
 		logger:      logger,
-		sessionID:   rand.GenerateUuid(),
+		id:          rand.GenerateUuid(),
 		broadcaster: b,
 		active:      true,
 		isClient:    false,
@@ -118,7 +118,7 @@ func NewSession(logger *zap.Logger, b Broadcaster) *Session {
 
 func NewClientSession(app string, tcUrl string, streamKey string, audioCallback AudioCallback, videoCallback VideoCallback, metadataCallback MetadataCallback) *Session {
 	session := &Session{
-		sessionID:  rand.GenerateUuid(),
+		id:         rand.GenerateUuid(),
 		isClient:   true,
 		app:        app,
 		tcUrl:      tcUrl,
@@ -145,7 +145,7 @@ func (session *Session) Start() error {
 			if constants.Debug {
 				fmt.Println("session: destroying subscriber")
 			}
-			session.broadcaster.DestroySubscriber(session.streamKey, session.sessionID)
+			session.broadcaster.DestroySubscriber(session.streamKey, session.id)
 		}
 		if session.isPublisher {
 			if constants.Debug {
@@ -289,7 +289,7 @@ func (session *Session) onStatus(info map[string]interface{}) {
 }
 
 func (session *Session) GetID() string {
-	return session.sessionID
+	return session.id
 }
 
 func (session *Session) onWindowAckSizeReached(sequenceNumber uint32) {

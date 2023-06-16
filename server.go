@@ -60,12 +60,12 @@ func (s *Server) Listen() error {
 				NewChunkHandler(socketr, socketw),
 			)
 
-			s.Logger.Info(fmt.Sprint("[server] Starting server session with sessionId ", sess.sessionID))
+			s.Logger.Info(fmt.Sprint("[server] Starting server session with sessionId ", sess.id))
 			err := sess.Start()
 			if err != io.EOF {
-				s.Logger.Error(fmt.Sprint("[server] Server session with sessionId ", sess.sessionID, " ended with an error: ", err))
+				s.Logger.Error(fmt.Sprint("[server] Server session with sessionId ", sess.id, " ended with an error: ", err))
 			} else {
-				s.Logger.Info(fmt.Sprint("[server] Server session with sessionId ", sess.sessionID, " ended."))
+				s.Logger.Info(fmt.Sprint("[server] Server session with sessionId ", sess.id, " ended."))
 			}
 		}(conn)
 

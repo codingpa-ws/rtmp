@@ -1,13 +1,18 @@
 # RTMP Server
-RTMP server written in Go (Golang) that allows stream publishing.
+
+RTMP server written in Go (Golang) that allows stream publishing, forked
+from [torresjeff/rtmp](https://github.com/torresjeff/rtmp) to add more
+configuration for [Livewoof](https://twitter.com/livewoof) servers.
 
 ## Install
-`go get github.com/torresjeff/rtmp`
+
+`go get github.com/codingpa-ws/rtmp`
 
 ## How to start your RTMP server
+
 Start up a server for the ingestion/playback of an RTMP stream (default port is 1935):
 
-```
+```go
 package main
 
 import (
@@ -22,7 +27,8 @@ func main() {
 ```
 
 You can also create a client to listen for events on a stream (eg: audio, video, and metadata events) so you can do further processing on the media that is being streamed:
-```
+
+```go
 package main
 
 import (
@@ -42,7 +48,7 @@ func OnVideo(frameType video.FrameType, codec video.Codec, payload []byte, times
 }
 
 func OnMetadata(metadata map[string]interface{}) {
-	fmt.Printf("client: on metadata: %+v", metadata) 
+	fmt.Printf("client: on metadata: %+v", metadata)
 }
 
 func main() {
@@ -58,5 +64,3 @@ func main() {
 ```
 
 To view other options accepted by the Server and Client structs, look at the `examples` directory.
-## Additional notes
-- This is a work in progress. 

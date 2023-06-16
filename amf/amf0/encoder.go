@@ -33,7 +33,7 @@ func Encode(v interface{}) ([]byte, error) {
 }
 
 func encodeDate(t time.Time) []byte {
-	timestamp := t.UnixNano()/1000000
+	timestamp := t.UnixNano() / 1000000
 	var buf [11]byte
 	buf[0] = TypeDate
 	binary.BigEndian.PutUint64(buf[1:], uint64(timestamp))
@@ -47,7 +47,7 @@ func encodeECMAArray(ecmaArray ECMAArray) []byte {
 	// The actual payload of the object is the length of the object buffer, minus the header byte (1 byte) and the endObject bytes (3 bytes).
 	objPayloadLength := len(obj) - 4
 	// An ECMA Array is an object that has additional information (associative count - 4 bytes, this is the number of keys)
-	buf := make([]byte, 1 + 4 + objPayloadLength)
+	buf := make([]byte, 1+4+objPayloadLength)
 	buf[0] = TypeECMAArray
 	// Put the associative count (how many keys the object has)
 	binary.BigEndian.PutUint32(buf[1:5], uint32(len(ecmaArray)))
@@ -75,7 +75,7 @@ func encodeObject(m map[string]interface{}) []byte {
 	}
 
 	buf.Write(encodeObjectEnd())
-	obj := make([]byte, 1 + buf.Len())
+	obj := make([]byte, 1+buf.Len())
 	obj[0] = TypeObject
 	copy(obj[1:], buf.Bytes())
 	return obj
@@ -90,7 +90,7 @@ func encodeString(s string) []byte {
 		// byte 0 => string type (TypeString)
 		// bytes 1-2 => string length
 		// bytes 3-end => string content
-		str := make([]byte, 3 + len(s))
+		str := make([]byte, 3+len(s))
 		str[0] = TypeString
 		binary.BigEndian.PutUint16(str[1:3], uint16(len(s)))
 		copy(str[3:], s)
@@ -100,7 +100,7 @@ func encodeString(s string) []byte {
 		// byte 0 => string type (TypeLongString)
 		// bytes 1-4 => string length
 		// bytes 5-end => string content
-		str := make([]byte, 5 + len(s))
+		str := make([]byte, 5+len(s))
 		str[0] = TypeLongString
 		binary.BigEndian.PutUint32(str[1:5], uint32(len(s)))
 		copy(str[5:], s)

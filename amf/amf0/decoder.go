@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-
 // Decode returns the original form of the encoded value, or an error if any occurred.
 // Possible return types: float64, bool, string, map[string]interface{}, nil, amf0.ECMAArray, time.Time
 // If the contents of b represent a Number (either int or float), it will be returned as a float64
@@ -132,7 +131,7 @@ func decodeObject(bytes []byte) map[string]interface{} {
 		//	break
 		//}
 		// Update slice to start at next value (skip the first 2 bytes that indicate the string length + the string itself)
-		bytes = bytes[2 + keyLength:]
+		bytes = bytes[2+keyLength:]
 		// Decode value
 		val, _ := Decode(bytes)
 		m[key] = val
@@ -143,7 +142,7 @@ func decodeObject(bytes []byte) map[string]interface{} {
 
 func decodeDate(bytes []byte) time.Time {
 	milliseconds := int64(binary.BigEndian.Uint64(bytes))
-	return time.Unix(0, milliseconds * 1000000)
+	return time.Unix(0, milliseconds*1000000)
 }
 
 func decodeString(bytes []byte, length uint32) string {

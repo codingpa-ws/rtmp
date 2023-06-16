@@ -40,10 +40,10 @@ func encodeObject(i map[string]interface{}) []byte {
 
 func encodeDate(t time.Time) []byte {
 	buf := make([]byte, 0)
-	buf = append(buf, TypeDate) // 1 byte header
+	buf = append(buf, TypeDate)        // 1 byte header
 	buf = append(buf, encodeU29(1)...) // 1 indicates explicit timestamp (ie. not a reference)
 
-	timestamp := t.UnixNano()/1000000
+	timestamp := t.UnixNano() / 1000000
 	buf = append(buf, encodeDouble(float64(timestamp))...)
 	// Last 2 bytes are time zone (which should stay with a value of 0 as defined by the spec)
 
@@ -117,11 +117,11 @@ func encodeDouble(f float64) []byte {
 func encodeBool(b bool) []byte {
 	var buf [1]byte
 	if b {
-		buf [0] = TypeTrue
+		buf[0] = TypeTrue
 	} else {
 		buf[0] = TypeFalse
 	}
-	return buf [:]
+	return buf[:]
 }
 
 func encodeNull() []byte {

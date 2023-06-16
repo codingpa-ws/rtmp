@@ -2,6 +2,7 @@ package rand
 
 import (
 	cryptoRand "crypto/rand"
+
 	"github.com/google/uuid"
 )
 
@@ -23,7 +24,6 @@ func GenerateCryptoSafeRandomData(b []byte) error {
 	}
 	return nil
 }
-
 
 // GenerateUuid returns a UUID in string format (including hyphens).
 func GenerateUuid() string {

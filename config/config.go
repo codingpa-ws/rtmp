@@ -3,7 +3,8 @@ package config
 const DefaultPort = "1935"
 
 var Debug = true
-const BuffioSize = 1024*64
+
+const BuffioSize = 1024 * 64
 
 const App = "app"
 const DefaultClientWindowSize uint32 = 2500000
@@ -17,4 +18,3 @@ const Capabilities int = 31
 const Mode int = 1
 
 const DefaultStreamID int = 1
-

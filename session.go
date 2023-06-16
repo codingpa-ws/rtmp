@@ -164,16 +164,13 @@ func (session *Session) Start() error {
 		fmt.Println("Handshake completed successfully")
 	}
 
-	// After handshake, start reading chunks
-	for {
-		if session.active {
-			if err = session.messageManager.nextMessage(); err != nil {
-				return err
-			}
-		} else {
-			return nil
+	for session.active {
+		if err = session.messageManager.nextMessage(); err != nil {
+			return err
 		}
 	}
+
+	return nil
 }
 
 func (session *Session) StartPlayback() error {
@@ -182,6 +179,7 @@ func (session *Session) StartPlayback() error {
 	if err != nil {
 		return err
 	}
+
 	if constants.Debug {
 		fmt.Println("client handshake completed successfully")
 	}

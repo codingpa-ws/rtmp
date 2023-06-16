@@ -22,7 +22,7 @@ type Server struct {
 // Listen starts the server and listens for any incoming connections. If no Addr (host:port) has been assigned to the server, ":1935" is used.
 func (s *Server) Listen() error {
 	if s.Addr == "" {
-		s.Addr = ":" + constants.DefaultPort
+		s.Addr = constants.DefaultAddress
 	}
 
 	tcpAddress, err := net.ResolveTCPAddr("tcp", s.Addr)

@@ -1,6 +1,7 @@
 package constants
 
 const DefaultPort = "1935"
+const DefaultAddress = ":" + DefaultPort
 
 var Debug = false
 
